@@ -1041,7 +1041,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 963194227}
   cube: {fileID: 5194978672562008010}
-  audioSource: {fileID: 0}
+  audioSource: {fileID: 963194231}
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2499,7 +2499,7 @@ GameObject:
   - component: {fileID: 5194978672562008011}
   - component: {fileID: 5194978672562008012}
   - component: {fileID: 5194978672562008014}
-  - component: {fileID: 5194978672562008015}
+  - component: {fileID: 5194978672562008013}
   m_Layer: 0
   m_Name: MQ-27-2
   m_TagString: Untagged
@@ -2536,7 +2536,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5194978672562008014
+--- !u!114 &5194978672562008013
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2551,8 +2551,7 @@ MonoBehaviour:
   velocity_X: {fileID: 1273296788}
   velocity_Y: {fileID: 1280813183}
   velocity_Z: {fileID: 1372968676}
-  JoyrtcComponent: {fileID: 963194229}
---- !u!114 &5194978672562008015
+--- !u!114 &5194978672562008014
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -28,7 +28,7 @@ public class MessageData
 {
   public MyObject joystick1;
   public MyObject joystick2;
-  public string text; // 添加文本数据的属性
+  //public string text; // Add a property to store text data
 }
 
 
@@ -38,8 +38,8 @@ public class joyrtc : MonoBehaviour
 #pragma warning disable 0649
   [SerializeField] private Camera cam;
   [SerializeField] private GameObject cube;
-  //[SerializeField] private AudioSource audioSource;
-  //private AudioStreamTrack audioStreamTrack;
+  [SerializeField] private AudioSource audioSource;
+  private AudioStreamTrack audioStreamTrack;
 
 #pragma warning restore 0649
 
@@ -51,15 +51,15 @@ public class joyrtc : MonoBehaviour
 	private MediaStream videoStream;
 
   private List<RTCRtpSender> pcSenders = new List<RTCRtpSender>();
-  //private MediaStream audioStream = new MediaStream();
+  private MediaStream audioStream;
 
-  //定义一个变量来储存要发送的文本数据
-  private string textToSend;
+  //// define a variable to store the text data to be sent
+  //private string textToSend;
 
-  //添加三个公共属性来存储速度数据
-  public float VelocityX { get; set; }
-  public float VelocityY { get; set; }
-  public float VelocityZ { get; set; }
+  //// Add three common properties to store speed data
+  //public float VelocityX { get; set; }
+  //public float VelocityY { get; set; }
+  //public float VelocityZ { get; set; }
 
 
   private static RTCConfiguration GetSelectedSdpSemantics()
@@ -95,15 +95,15 @@ public class joyrtc : MonoBehaviour
       Debug.Log("track: " + track);
       pcSenders.Add(_pc.AddTrack(track, videoStream));
     }
-
-    //// 添加音频轨道
-    //foreach (var track in audioStream.GetTracks())
-    //{
-    //  Debug.Log("track: " + track);
-    //  pcSenders.Add(_pc.AddTrack(track, audioStream));
-    //}
+    // Add audio track
+    foreach (var track in audioStream.GetTracks())
+    {
+      Debug.Log("track: " + track);
+      pcSenders.Add(_pc.AddTrack(track, audioStream));
+    }
 
   }
+
 
   private IEnumerator OnCreateOffer(RTCPeerConnection pc, RTCSessionDescription desc)
   {
@@ -203,17 +203,17 @@ public class joyrtc : MonoBehaviour
       float joystick2Y = messageData.joystick2.y;
       Debug.Log(message);
 
-      //前端按下button后切换模式
+      // Toggle mode after frontend presses button
       if (dataChannel != null && message == "{\"type\":\"camera_mode_toggle\"}")
       {
         enableCameraModeToggle = true;
       }
-      // 将x和y应用到物体的移动
+      // Apply x and y to the movement of the object
 
-      // 旋转
+      // Rotate
       cube.transform.rotation *= Quaternion.Euler(0, joystick2X * 2f, 0);
 
-      // 移动
+      // Move
       Vector3 forwardVector = cube.transform.forward;
       Vector3 rightVector = cube.transform.right;
       Vector3 verticalMovement = cube.transform.up * joystick2Y * 0.1f;
@@ -234,14 +234,12 @@ public class joyrtc : MonoBehaviour
       Debug.Log("track: " + track);
       _pc.AddTrack(track, videoStream);
     }
-
-    ////调用AddTracks()方法来添加音频轨道到WebRTC
-    //foreach (var track in audioStream.GetTracks())
-    //{
-    //  Debug.Log("track: " + track);
-    //  _pc.AddTrack(track, audioStream);
-    //}
-
+    // Call AddTracks() method to add audio tracks to WebRTC
+    foreach (var track in audioStream.GetTracks())
+    {
+      Debug.Log("track: " + track);
+      _pc.AddTrack(track, audioStream);
+    }
 
     RTCSessionDescription offer;
     while (sdp == null)
@@ -271,31 +269,29 @@ public class joyrtc : MonoBehaviour
       videoStream = cam.CaptureStream(1280, 720);
     }
     StartCoroutine(WebRTC.Update());
+    audioSource = GetComponent<AudioSource>();
+    pcSenders = new List<RTCRtpSender>();
+    audioStream = new MediaStream();
+
+    // Whether audioSource is null
+    if (audioSource != null)
+    {
+      Debug.Log("audioSource exists!");
+      // 创建 `AudioStreamTrack` 对象并将 `audioSource` 作为参数传递
+      // Create an 'AudioStreamTrack' object and pass 'audioSource' as a parameter
+      audioStreamTrack = new AudioStreamTrack(audioSource);
+
+      // 将音频轨道添加到 WebRTC 连接的音频流中
+      // Adds an audio track to a WebRTC connected audio stream
+      // _pc.AddTrack(audioStreamTrack, audioStream);
+    }
+    else
+    {
+      Debug.Log("audioSource does not exist!");
+    }
+
     StartCoroutine(AsyncWebRTCCoroutine());
-
-      //audioSource = GetComponent<AudioSource>();
-
-      pcSenders = new List<RTCRtpSender>();
-      //audioStream = new MediaStream();
-      //Debug.Log("audioStream created.");
-
-      //// audioSource 是否为 null
-      //if (audioSource != null)
-      //{
-      //  Debug.Log("audioSource exists!");
-      //  // 创建 `AudioStreamTrack` 对象并将 `audioSource` 作为参数传递
-      //  audioStreamTrack = new AudioStreamTrack(audioSource);
-
-      //  // 将音频轨道添加到 WebRTC 连接的音频流中
-      //  _pc.AddTrack(audioStreamTrack, audioStream);
-      //}
-      //else
-      //{
-      //  Debug.Log("audioSource does not exist!");
-      //}
-
-
-      string envServerUrl = System.Environment.GetEnvironmentVariable("SERVER_URL");
+    string envServerUrl = System.Environment.GetEnvironmentVariable("SERVER_URL");
     string serverUrl = string.IsNullOrEmpty(envServerUrl) ? DefaultServer : envServerUrl;
     ws = new WebSocket(serverUrl);
     ws.OnMessage += (sender, e) => {
@@ -327,27 +323,32 @@ public class joyrtc : MonoBehaviour
     }
 
 
-      // 创建一个消息对象，将速度数据存储在其中
-      MessageData messageData = new MessageData
-      {
-        joystick1 = new MyObject(),
-        joystick2 = new MyObject(),
-        text = null, // 不发送文本数据
-      };
-      // 设置速度数据
-      messageData.joystick1.x = VelocityX;
-      messageData.joystick1.y = VelocityY;
-      messageData.joystick2.x = VelocityZ;
+    //// 创建一个消息对象，将速度数据存储在其中
+    //// Create a message object in which the speed data is stored
+    //MessageData messageData = new MessageData
+    //  {
+    //    joystick1 = new MyObject(),
+    //    joystick2 = new MyObject(),
+    //    text = null, // 不发送文本数据
+    //  };
+    //// 设置速度数据
+    //// Set the speed data
+    //  messageData.joystick1.x = VelocityX;
+    //  messageData.joystick1.y = VelocityY;
+    //  messageData.joystick2.x = VelocityZ;
 
-      // 将消息对象转换为 JSON 字符串
-      string messageJson = JsonUtility.ToJson(messageData);
+    //// 将消息对象转换为 JSON 字符串
+    //// Converts the message object to a JSON string
+    //string messageJson = JsonUtility.ToJson(messageData);
 
-      // 发送消息
-      ws.Send(messageJson);
+    //// 发送消息
+    //// Send a message
+    //  ws.Send(messageJson);
 
-      // 清空速度数据
-      VelocityX = 0;
-      VelocityY = 0;
-      VelocityZ = 0;
+    //// 清空速度数据
+    //// Clear the speed data
+    //  VelocityX = 0;
+    //  VelocityY = 0;
+    //  VelocityZ = 0;
   }
 }
