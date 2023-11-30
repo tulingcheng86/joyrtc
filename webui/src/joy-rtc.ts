@@ -57,6 +57,32 @@ class JoyRtcComponent extends HTMLElement {
 		});
 		this.root.appendChild(buttonClick);
 
+    //音量按钮
+    const buttonVolumeUp = document.createElement("button");
+    buttonVolumeUp.innerText = "音量+";
+    buttonVolumeUp.addEventListener("click", () => {
+      const audioElement = document.querySelector("audio"); // 获取 <audio> 元素
+      if (audioElement) {
+        const audioContext = new AudioContext(); // 创建 AudioContext 对象
+
+        // 创建 GainNode 对象
+        const gainNode = audioContext.createGain();
+
+        const currentVolume = gainNode.gain.value; // 获取当前音量值
+        const newVolume = currentVolume + 0.1; // 增加音量
+
+        gainNode.gain.setValueAtTime(newVolume, audioContext.currentTime); // 设置新的音量值
+
+        const source = audioContext.createMediaElementSource(audioElement); // 创建 MediaElementSource 对象
+        source.connect(gainNode); // 连接 Source 到 GainNode
+        gainNode.connect(audioContext.destination); // 连接 GainNode 到目标音频输出
+
+        audioElement.play(); // 播放音频
+      }
+    });
+    this.root.appendChild(buttonVolumeUp);
+
+
 		// 创建两个容器
 		const pad1 = document.createElement("div");
 		pad1.innerText = "摇杆1";

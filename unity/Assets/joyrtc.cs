@@ -53,15 +53,6 @@ public class joyrtc : MonoBehaviour
   private List<RTCRtpSender> pcSenders = new List<RTCRtpSender>();
   private MediaStream audioStream;
 
-  //// define a variable to store the text data to be sent
-  //private string textToSend;
-
-  //// Add three common properties to store speed data
-  //public float VelocityX { get; set; }
-  //public float VelocityY { get; set; }
-  //public float VelocityZ { get; set; }
-
-
   private static RTCConfiguration GetSelectedSdpSemantics()
   {
     RTCConfiguration config = default;
@@ -269,25 +260,18 @@ public class joyrtc : MonoBehaviour
       videoStream = cam.CaptureStream(1280, 720);
     }
     StartCoroutine(WebRTC.Update());
-    audioSource = GetComponent<AudioSource>();
     pcSenders = new List<RTCRtpSender>();
     audioStream = new MediaStream();
-
+    audioSource = GetComponent<AudioSource>();
     // Whether audioSource is null
+    // Add this debug log to check if audioSource is null
     if (audioSource != null)
     {
       Debug.Log("audioSource exists!");
-      // 创建 `AudioStreamTrack` 对象并将 `audioSource` 作为参数传递
       // Create an 'AudioStreamTrack' object and pass 'audioSource' as a parameter
       audioStreamTrack = new AudioStreamTrack(audioSource);
-
-      // 将音频轨道添加到 WebRTC 连接的音频流中
       // Adds an audio track to a WebRTC connected audio stream
-      // _pc.AddTrack(audioStreamTrack, audioStream);
-    }
-    else
-    {
-      Debug.Log("audioSource does not exist!");
+      _pc.AddTrack(audioStreamTrack, audioStream);
     }
 
     StartCoroutine(AsyncWebRTCCoroutine());
@@ -322,33 +306,5 @@ public class joyrtc : MonoBehaviour
       enableCameraModeToggle = false;
     }
 
-
-    //// 创建一个消息对象，将速度数据存储在其中
-    //// Create a message object in which the speed data is stored
-    //MessageData messageData = new MessageData
-    //  {
-    //    joystick1 = new MyObject(),
-    //    joystick2 = new MyObject(),
-    //    text = null, // 不发送文本数据
-    //  };
-    //// 设置速度数据
-    //// Set the speed data
-    //  messageData.joystick1.x = VelocityX;
-    //  messageData.joystick1.y = VelocityY;
-    //  messageData.joystick2.x = VelocityZ;
-
-    //// 将消息对象转换为 JSON 字符串
-    //// Converts the message object to a JSON string
-    //string messageJson = JsonUtility.ToJson(messageData);
-
-    //// 发送消息
-    //// Send a message
-    //  ws.Send(messageJson);
-
-    //// 清空速度数据
-    //// Clear the speed data
-    //  VelocityX = 0;
-    //  VelocityY = 0;
-    //  VelocityZ = 0;
   }
 }
