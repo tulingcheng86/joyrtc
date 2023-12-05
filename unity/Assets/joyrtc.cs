@@ -225,12 +225,12 @@ public class joyrtc : MonoBehaviour
       Debug.Log("track: " + track);
       _pc.AddTrack(track, videoStream);
     }
-    // Call AddTracks() method to add audio tracks to WebRTC
-    foreach (var track in audioStream.GetTracks())
-    {
-      Debug.Log("track: " + track);
-      _pc.AddTrack(track, audioStream);
-    }
+    ////Call AddTracks() method to add audio tracks to WebRTC
+    //foreach (var track in audioStream.GetTracks())
+    //{
+    //  Debug.Log("track: " + track);
+    //  _pc.AddTrack(track, audioStream);
+    //}
 
     RTCSessionDescription offer;
     while (sdp == null)
